@@ -4,14 +4,16 @@ const cors = require("cors")
 const cookieParser = require("cookie-parser")
 const { hotelProtected, adminProtected, userProtected } = require("./middleware/auth.middleware")
 require("dotenv").config()
+const path = require("path")
 
 
 const app = express()
 
 app.use(express.json())
+app.use(express.static("dist"))
 app.use(cookieParser())
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: "https://hyperlocal-delevery-tracker.onrender.com",
     credentials: true
 }))
 app.use("/api/auth", require("./routes/auth.route"))
@@ -21,9 +23,8 @@ app.use("/api/admin", adminProtected, require("./routes/admin.route"))
 app.use("/api/user", userProtected, require("./routes/user.route"))
 
 app.use("*", (req, res) => {
-    res.status(404).json({ message: "resource noot found" })
-
-})
+    res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
 app.use((err, req, res, next) => {
     console.log(err)
     res.status(500).json({ message: "server error", error: err.message })
